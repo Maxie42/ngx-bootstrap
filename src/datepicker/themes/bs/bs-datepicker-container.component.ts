@@ -20,7 +20,7 @@ import { TimepickerComponent } from 'ngx-bootstrap/timepicker';
 import { datepickerAnimation } from '../../datepicker-animations';
 import { BsDatepickerAbstractComponent } from '../../base/bs-datepicker-container';
 import { BsDatepickerConfig } from '../../bs-datepicker.config';
-import { CalendarCellViewModel, DatePickerButtonAction, DateRangePickerButtonAction, DayViewModel } from '../../models';
+import { CalendarCellViewModel, DatepickerButtonAction, DateRangepickerButtonAction, DayViewModel } from '../../models';
 import { BsDatepickerActions } from '../../reducer/bs-datepicker.actions';
 import { BsDatepickerEffects } from '../../reducer/bs-datepicker.effects';
 import { BsDatepickerStore } from '../../reducer/bs-datepicker.store';
@@ -128,15 +128,7 @@ export class BsDatepickerContainerComponent
     this.clearBtnLbl = this._config.clearButtonLabel;
     this.clearPos = this._config.clearPosition;
     this.customButtons = [...(this._config.customButtons ?? [])];
-    const todayIdx = states.findIndex(state => state == this.todayPos);
-    const clearIdx = states.findIndex(state => state == this.clearPos);
-    if (todayIdx <= clearIdx) {
-      this.setupTodayButton();
-      this.setupClearButton();
-    } else {
-      this.setupClearButton();
-      this.setupTodayButton();
-    }
+    this.setupButtons();
     this.customRangeBtnLbl = this._config.customRangeButtonLabel;
     this.withTimepicker = this._config.withTimepicker;
     this._effects
@@ -252,7 +244,7 @@ export class BsDatepickerContainerComponent
     this._store.dispatch(this._actions.select(undefined));
   }
 
-  override buttonClicked(action: DatePickerButtonAction | DateRangePickerButtonAction): void {
+  override buttonClicked(action: DatepickerButtonAction | DateRangepickerButtonAction): void {
     action((this.currentDate) as any);
   }
 

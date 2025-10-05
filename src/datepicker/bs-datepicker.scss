@@ -478,6 +478,7 @@
     flex-direction: row;
     flex-flow: wrap;
     padding-top: 10px;
+    column-gap: 0.5rem;
     border-top: 1px solid $border-color;
 
     .btn-default {
@@ -487,20 +488,6 @@
     .btn-today-wrapper {
       display: flex;
       flex-flow: row wrap;
-    }
-
-    .clear-right,
-    .today-right {
-      flex-grow: 0;
-    }
-    .clear-left,
-    .today-left {
-      flex-grow: 1;
-    }
-
-    .clear-center,
-    .today-center {
-      flex-grow: 0.5;
     }
   }
 }

@@ -112,19 +112,21 @@ export interface DatepickerDateTooltipText {
   date: Date;
   tooltipText: string;
 }
-export type DatePickerButtonAction = (value: Date | undefined) => void ;
-export type DateRangePickerButtonAction = (value: Date[] | undefined) => void;
+export type DatepickerButtonPosition = 'left' | 'center' | 'right';
+export type DatepickerButtonAction = (value: Date | undefined) => void ;
+export type DateRangepickerButtonAction = (value: Date[] | undefined) => void;
 interface CustomButton {
   label: string;
+  position: DatepickerButtonPosition;
   containerClass?: string;
   btnClass?: string;
 }
 export interface DatepickerCustomButton extends CustomButton {
-  action: DatePickerButtonAction;
+  action: DatepickerButtonAction;
 }
 
 export interface DateRangepickerCustomButton extends CustomButton {
-  action: DateRangePickerButtonAction;
+  action: DateRangepickerButtonAction;
 }
 
 /** *************** */

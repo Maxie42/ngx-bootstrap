@@ -22,9 +22,14 @@
         {{clearState}}
     </button>
     <button class="btn btn-success mx-2"
-              (click)="withApplyAndCancel()"
+              (click)="withApply()"
               type="button">
-        {{applyAndCancelState}}
+        {{applyState}}
+    </button>
+    <button class="btn btn-success mx-2"
+            (click)="withCancel()"
+            type="button">
+        {{cancelState}}
     </button>
   </div>
 </div>
@@ -52,9 +57,14 @@
         {{clearStateRange}}
     </button>
     <button class="btn btn-success mx-2"
-              (click)="withApplyAndCancel('range')"
+              (click)="withApply('range')"
               type="button">
-        {{applyAndCancelStateRange}}
+        {{applyStateRange}}
+    </button>
+    <button class="btn btn-success mx-2"
+              (click)="withCancel('range')"
+              type="button">
+        {{cancelStateRange}}
     </button>
   </div>
 </div>

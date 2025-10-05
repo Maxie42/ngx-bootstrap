@@ -1,5 +1,6 @@
 import { Component, ViewChild } from '@angular/core';
 import { BsDatepickerConfig, BsDatepickerDirective, BsDaterangepickerConfig, BsDaterangepickerDirective } from 'ngx-bootstrap/datepicker';
+import { DatepickerButtonPosition } from 'src/datepicker/models';
 interface IRange {
   value: Date[];
   label: string;
@@ -50,15 +51,26 @@ export class DemoDatepickerCustomButtonComponent {
       return this.getText(this._clearStateRange, 'Clear');
     }
 
-    private _applyAndCancelState = false;
-    public get applyAndCancelState(): string {
-      return this._applyAndCancelState ? 'Custom buttons: enabled' : 'Custom buttons: disabled';
+    private _applyState = 0;
+    public get applyState(): string {
+      return this.getText(this._applyState, 'Custom Apply');
     }
 
-    private _applyAndCancelStateRange = false;
-    public get applyAndCancelStateRange(): string {
-      return this._applyAndCancelStateRange ? 'Custom buttons: enabled' : 'Custom buttons: disabled';
+    private _applyStateRange = 0;
+    public get applyStateRange(): string {
+      return this.getText(this._applyStateRange, 'Custom Apply');
     }
+
+    private _cancelState = 0;
+    public get cancelState(): string {
+      return this.getText(this._cancelState, 'Custom Cancel');
+    }
+
+    private _cancelStateRange = 0;
+    public get cancelStateRange(): string {
+      return this.getText(this._cancelStateRange, 'Custom Cancel');
+    }
+
 
     public withToday(range?: 'range'): void {
       if (range) {
@@ -84,15 +96,30 @@ export class DemoDatepickerCustomButtonComponent {
       this.generateConfig();
     }
 
-    public withApplyAndCancel(range?: 'range'): void {
+    public withApply(range?: 'range'): void {
       if (range) {
-        this._applyAndCancelStateRange = !this._applyAndCancelStateRange;
+        this._applyStateRange++;
+        this._applyStateRange = this._applyStateRange % 4;
         this.generateRangeConfig();
         return;
       }
-      this._applyAndCancelState = !this._applyAndCancelState;
+      this._applyState++;
+      this._applyState = this._applyState % 4;
       this.generateConfig();
     }
+
+    public withCancel(range?: 'range'): void {
+      if (range) {
+        this._cancelStateRange++;
+        this._cancelStateRange = this._cancelStateRange % 4;
+        this.generateRangeConfig();
+        return;
+      }
+      this._cancelState++;
+      this._cancelState = this._cancelState % 4;
+      this.generateConfig();
+    }
+
     public get hasDateChanged(): boolean {
       return this.previousValue != this.bsValue;
     }
@@ -101,16 +128,26 @@ export class DemoDatepickerCustomButtonComponent {
       return this.previousRangeValue != this.bsRangeValue;
     }
     private generateConfig(): void {
-      const styles = this.getStyles(this._todayState, this._clearState);
       this.config = {
         ...this.defaultConfig,
         showTodayButton: this._todayState > 0,
-        todayPosition: this.states[this._todayState],
+        todayPosition: this.states[this._todayState] as DatepickerButtonPosition,
         showClearButton: this._clearState > 0,
-        clearPosition: this.states[this._clearState],
-        customButtons: this._applyAndCancelState ? [
-          { label: 'Apply', btnClass: 'btn-primary', containerClass: styles.apply, action: (date) => this.applyDate(date) },
-          { label: 'Cancel', btnClass: 'btn-secondary', containerClass: styles.cancel, action: (date) => this.cancelDate(date) },
+        clearPosition: this.states[this._clearState] as DatepickerButtonPosition,
+        customButtons: this._applyState + this._cancelState > 0 ? [
+          {
+            label: 'Apply',
+            btnClass: 'btn-primary',
+		        containerClass: 'btn-default-wrapper',
+            position: this.states[this._applyState] as DatepickerButtonPosition,
+            action: (date) => this.applyDate(date)
+          },
+          {
+            label: 'Cancel',
+            btnClass: 'btn-secondary',
+            position: this.states[this._cancelState] as DatepickerButtonPosition,
+            action: (date) => this.cancelDate(date)
+          },
         ] :[]
       }
       setTimeout(() => {
@@ -121,32 +158,28 @@ export class DemoDatepickerCustomButtonComponent {
         }
       },10);
     }
-    private getStyles(today: number, clear: number): {apply: string, cancel: string} {
-      const everythingDisabled = today == 0 && clear == 0;
-      const bothLeft = (today == 1 || today == 0) && (clear == 1 || clear == 0);
-      const anythingRight = today == 3 || clear == 3;
-      const bothRight = (today == 3 || today == 0) && (clear == 3 || clear == 0);
-      let applyStyle = !bothRight ? 'me-2' : 'me-1';
-      let cancelStyle = 'ms-1';
-      if (everythingDisabled || bothLeft) {
-        applyStyle = 'ms-auto me-1';
-      }
-      if (anythingRight) {
-        cancelStyle = 'ms-1 me-2';
-      }
-      return {apply: applyStyle, cancel: cancelStyle}
-    }
+
     private generateRangeConfig(): void {
-      const styles = this.getStyles(this._todayStateRange, this._clearStateRange);
       this.rangeConfig = {
         ...this.defaultRangeConfig,
         showTodayButton: this._todayStateRange > 0,
-        todayPosition: this.states[this._todayStateRange],
+        todayPosition: this.states[this._todayStateRange] as DatepickerButtonPosition,
         showClearButton: this._clearStateRange > 0,
-        clearPosition: this.states[this._clearStateRange],
-        customButtons: this._applyAndCancelStateRange ? [
-          { label: 'Apply', btnClass: 'btn-primary', containerClass: styles.apply, action: (date) => this.applyDateRange(date) },
-          { label: 'Cancel', btnClass: 'btn-secondary', containerClass: styles.cancel, action: (date) => this.cancelDateRange(date) },
+        clearPosition: this.states[this._clearStateRange] as DatepickerButtonPosition,
+        customButtons: this._applyStateRange + this._cancelStateRange > 0 ? [
+          {
+            label: 'Apply',
+            btnClass: 'btn-primary',
+		        containerClass: 'btn-default-wrapper',
+            position: this.states[this._applyStateRange] as DatepickerButtonPosition,
+            action: (date) => this.applyDateRange(date)
+          },
+          {
+            label: 'Cancel',
+            btnClass: 'btn-secondary',
+            position: this.states[this._cancelStateRange] as DatepickerButtonPosition,
+            action: (date) => this.cancelDateRange(date)
+          },
         ] :[]
       }
       setTimeout(() => {

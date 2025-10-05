@@ -5,7 +5,8 @@ import {
   DatepickerDateCustomClasses,
   DatepickerDateTooltipText,
   DatepickerCustomButton,
-  DateRangepickerCustomButton
+  DateRangepickerCustomButton,
+  DatepickerButtonPosition
 } from './models';
 import { BsCustomDates } from './themes/bs/bs-custom-dates-view.component';
 
@@ -155,12 +156,12 @@ export class BsDatepickerConfig implements DatepickerRenderOptions {
   /**
    * Positioning of 'today' button
    */
-  todayPosition = 'center';
+  todayPosition: DatepickerButtonPosition = 'center';
 
   /**
    * Positioning of 'clear' button
    */
-  clearPosition = 'right';
+  clearPosition: DatepickerButtonPosition = 'right';
 
   /**
    * Label for 'today' button

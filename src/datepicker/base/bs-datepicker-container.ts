@@ -16,9 +16,10 @@ import {
   WeekViewModel,
   YearsCalendarViewModel,
   DatepickerCustomButton,
-  DatePickerButtonAction,
-  DateRangePickerButtonAction,
-  DateRangepickerCustomButton
+  DatepickerButtonAction,
+  DateRangepickerButtonAction,
+  DateRangepickerCustomButton,
+  DatepickerButtonPosition
 } from '../models';
 
 export abstract class BsDatepickerAbstractComponent {
@@ -26,10 +27,10 @@ export abstract class BsDatepickerAbstractComponent {
   isOtherMonthsActive?: boolean;
   showTodayBtn?: boolean;
   todayBtnLbl?: string;
-  todayPos?: string;
+  todayPos?: DatepickerButtonPosition;
   showClearBtn?: boolean;
   clearBtnLbl?: string;
-  clearPos?: string;
+  clearPos?: DatepickerButtonPosition;
   customButtons?: (DatepickerCustomButton | DateRangepickerCustomButton)[];
 
   _effects?: BsDatepickerEffects;
@@ -136,75 +137,50 @@ export abstract class BsDatepickerAbstractComponent {
   clearDate(): void {}
 
   // eslint-disable-next-line
-  buttonClicked(action: DatePickerButtonAction | DateRangePickerButtonAction): void {}
+  buttonClicked(action: DatepickerButtonAction | DateRangepickerButtonAction): void {}
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   _stopPropagation(event: any): void {
     event.stopPropagation();
   }
 
-  protected setupTodayButton(): void {
-    if (this.showTodayBtn && this.customButtons && this.todayBtnLbl) {
-      let margins = ''
-      switch (this.todayPos) {
-        case 'left':
-          margins = !this.showClearBtn || this.clearPos != 'left' ? 'me-auto' : 'me-2';
-          this.customButtons.splice(0,0, {
-            containerClass: `btn-today-wrapper ${margins}`,
-            btnClass: 'btn-success',
-            label: this.todayBtnLbl,
-            action: () => this.setToday(),
-          });
-        break;
-        case 'right':
-          margins = (this.showClearBtn && this.clearPos == 'right' || !this.showClearBtn) ? 'ms-auto me-1' : 'me-2'
-          this.customButtons.splice(this.customButtons.length ,0, {
-            containerClass: `btn-today-wrapper ${margins}`,
-            btnClass: 'btn-success',
-            label: this.todayBtnLbl,
-            action: () => this.setToday(),
-          });
-        break;
-        default:
-          margins = this.clearPos == 'center' ? 'ms-auto me-1' : 'mx-auto'
-          this.customButtons.splice(Math.ceil(this.customButtons.length / 2), 0, {
-            containerClass: `btn-today-wrapper ${margins}`,
-            btnClass: 'btn-success',
-            label: this.todayBtnLbl,
-            action: () => this.setToday(),
-          });
-      }
+  protected setupButtons(): void {
+    if (this.customButtons == null) {
+      this.customButtons = [];
     }
-  }
+    this.customButtons = this.customButtons.map(btn => ({...btn, containerClass: btn.containerClass ?? ''}));
+    const left = this.customButtons.filter(btn => btn.position == 'left');
+    const center = this.customButtons.filter(btn => btn.position == 'center');
+    const right = this.customButtons.filter(btn => btn.position == 'right');
+    const complex = {left, center, right};
+    if (this.showClearBtn && this.clearBtnLbl && this.clearPos) {
+      complex[this.clearPos].splice(0,0, {
+        containerClass: 'btn-clear-wrapper',
+        position: this.clearPos,
+        btnClass: 'btn-success',
+        label: this.clearBtnLbl,
+        action: () => this.clearDate(),
+      });
+    }
+    if (this.showTodayBtn && this.todayBtnLbl && this.todayPos) {
+      complex[this.todayPos].splice(0,0, {
+        containerClass: 'btn-today-wrapper',
+        position: this.todayPos,
+        btnClass: 'btn-success',
+        label: this.todayBtnLbl,
+        action: () => this.setToday(),
+      });
+    }
 
-  protected setupClearButton(): void {
-    if (this.showClearBtn && this.customButtons && this.clearBtnLbl) {
-      const margins = this.showTodayBtn && this.todayPos != 'right' ? 'me-auto ms-1' : 'mx-auto'
-      switch (this.clearPos) {
-        case 'left':
-          this.customButtons.splice(this.showTodayBtn ? 1 : 0,0, {
-            containerClass: `btn-clear-wrapper ${this.showTodayBtn && this.todayPos != 'right' ? 'me-2' : 'me-auto' }`,
-            btnClass: 'btn-success',
-            label: this.clearBtnLbl,
-            action: () => this.clearDate(),
-          });
-        break;
-        case 'right':
-          this.customButtons.splice(this.customButtons.length ,0, {
-            containerClass: `btn-clear-wrapper ${this.showTodayBtn && this.todayPos != 'left' ? 'ms-2' : 'ms-auto' }`,
-            btnClass: 'btn-success',
-            label: this.clearBtnLbl,
-            action: () => this.clearDate(),
-          });
-        break;
-        default:
-          this.customButtons.splice(Math.ceil(this.customButtons.length / 2), 0, {
-            containerClass: `btn-clear-wrapper ${margins}`,
-            btnClass: 'btn-success',
-            label: this.clearBtnLbl,
-            action: () => this.clearDate(),
-          });
+    if (complex.center.length > 0) {
+      complex.center[0].containerClass += ' ms-auto'
+      if (complex.right.length == 0) {
+        complex.center[complex.center.length -1].containerClass += ' me-auto'
       }
     }
+    if (complex.right.length > 0) {
+      complex.right[0].containerClass += ' ms-auto'
+    }
+    this.customButtons = [ ...complex.left, ...complex.center, ...complex.right];
   }
 }
