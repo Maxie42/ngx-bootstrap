@@ -14,7 +14,11 @@ import {
   DayViewModel,
   MonthsCalendarViewModel,
   WeekViewModel,
-  YearsCalendarViewModel
+  YearsCalendarViewModel,
+  DatepickerCustomButton,
+  DatePickerButtonAction,
+  DateRangePickerButtonAction,
+  DateRangepickerCustomButton
 } from '../models';
 
 export abstract class BsDatepickerAbstractComponent {
@@ -26,6 +30,7 @@ export abstract class BsDatepickerAbstractComponent {
   showClearBtn?: boolean;
   clearBtnLbl?: string;
   clearPos?: string;
+  customButtons?: (DatepickerCustomButton | DateRangepickerCustomButton)[];
 
   _effects?: BsDatepickerEffects;
   customRanges: BsCustomDates[] = [];
@@ -130,8 +135,76 @@ export abstract class BsDatepickerAbstractComponent {
   // eslint-disable-next-line
   clearDate(): void {}
 
+  // eslint-disable-next-line
+  buttonClicked(action: DatePickerButtonAction | DateRangePickerButtonAction): void {}
+
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   _stopPropagation(event: any): void {
     event.stopPropagation();
+  }
+
+  protected setupTodayButton(): void {
+    if (this.showTodayBtn && this.customButtons && this.todayBtnLbl) {
+      let margins = ''
+      switch (this.todayPos) {
+        case 'left':
+          margins = !this.showClearBtn || this.clearPos != 'left' ? 'me-auto' : 'me-2';
+          this.customButtons.splice(0,0, {
+            containerClass: `btn-today-wrapper ${margins}`,
+            btnClass: 'btn-success',
+            label: this.todayBtnLbl,
+            action: () => this.setToday(),
+          });
+        break;
+        case 'right':
+          margins = (this.showClearBtn && this.clearPos == 'right' || !this.showClearBtn) ? 'ms-auto me-1' : 'me-2'
+          this.customButtons.splice(this.customButtons.length ,0, {
+            containerClass: `btn-today-wrapper ${margins}`,
+            btnClass: 'btn-success',
+            label: this.todayBtnLbl,
+            action: () => this.setToday(),
+          });
+        break;
+        default:
+          margins = this.clearPos == 'center' ? 'ms-auto me-1' : 'mx-auto'
+          this.customButtons.splice(Math.ceil(this.customButtons.length / 2), 0, {
+            containerClass: `btn-today-wrapper ${margins}`,
+            btnClass: 'btn-success',
+            label: this.todayBtnLbl,
+            action: () => this.setToday(),
+          });
+      }
+    }
+  }
+
+  protected setupClearButton(): void {
+    if (this.showClearBtn && this.customButtons && this.clearBtnLbl) {
+      const margins = this.showTodayBtn && this.todayPos != 'right' ? 'me-auto ms-1' : 'mx-auto'
+      switch (this.clearPos) {
+        case 'left':
+          this.customButtons.splice(this.showTodayBtn ? 1 : 0,0, {
+            containerClass: `btn-clear-wrapper ${this.showTodayBtn && this.todayPos != 'right' ? 'me-2' : 'me-auto' }`,
+            btnClass: 'btn-success',
+            label: this.clearBtnLbl,
+            action: () => this.clearDate(),
+          });
+        break;
+        case 'right':
+          this.customButtons.splice(this.customButtons.length ,0, {
+            containerClass: `btn-clear-wrapper ${this.showTodayBtn && this.todayPos != 'left' ? 'ms-2' : 'ms-auto' }`,
+            btnClass: 'btn-success',
+            label: this.clearBtnLbl,
+            action: () => this.clearDate(),
+          });
+        break;
+        default:
+          this.customButtons.splice(Math.ceil(this.customButtons.length / 2), 0, {
+            containerClass: `btn-clear-wrapper ${margins}`,
+            btnClass: 'btn-success',
+            label: this.clearBtnLbl,
+            action: () => this.clearDate(),
+          });
+      }
+    }
   }
 }

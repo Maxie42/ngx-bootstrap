@@ -3,7 +3,9 @@ import {
   DatepickerRenderOptions,
   BsDatepickerViewMode,
   DatepickerDateCustomClasses,
-  DatepickerDateTooltipText
+  DatepickerDateTooltipText,
+  DatepickerCustomButton,
+  DateRangepickerCustomButton
 } from './models';
 import { BsCustomDates } from './themes/bs/bs-custom-dates-view.component';
 
@@ -169,6 +171,16 @@ export class BsDatepickerConfig implements DatepickerRenderOptions {
    * Label for 'clear' button
    */
   clearButtonLabel = 'Clear';
+
+  /**
+   * Array for custom buttons shown under the date picker
+   */
+  customButtons?: (DatepickerCustomButton | DateRangepickerCustomButton)[];
+
+  /**
+   * Flag to disable hiding on selection change
+   */
+  closeOnSelect = true;
 
   /**
    * Label for 'custom range' button

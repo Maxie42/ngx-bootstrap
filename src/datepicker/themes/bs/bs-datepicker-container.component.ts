@@ -20,7 +20,7 @@ import { TimepickerComponent } from 'ngx-bootstrap/timepicker';
 import { datepickerAnimation } from '../../datepicker-animations';
 import { BsDatepickerAbstractComponent } from '../../base/bs-datepicker-container';
 import { BsDatepickerConfig } from '../../bs-datepicker.config';
-import { CalendarCellViewModel, DayViewModel } from '../../models';
+import { CalendarCellViewModel, DatePickerButtonAction, DateRangePickerButtonAction, DayViewModel } from '../../models';
 import { BsDatepickerActions } from '../../reducer/bs-datepicker.actions';
 import { BsDatepickerEffects } from '../../reducer/bs-datepicker.effects';
 import { BsDatepickerStore } from '../../reducer/bs-datepicker.store';
@@ -31,6 +31,7 @@ import { TimepickerModule } from 'ngx-bootstrap/timepicker';
 import { BsDaysCalendarViewComponent } from './bs-days-calendar-view.component';
 import { NgIf, NgClass, NgSwitch, NgSwitchCase, NgFor, AsyncPipe } from '@angular/common';
 
+const states = ['left' , 'center' , 'right'];
 @Component({
     selector: 'bs-datepicker-container',
     providers: [BsDatepickerStore, BsDatepickerEffects, BsDatepickerActions],
@@ -52,6 +53,7 @@ export class BsDatepickerContainerComponent
   implements OnInit, AfterViewInit, OnDestroy
 {
   valueChange: EventEmitter<Date> = new EventEmitter<Date>();
+  valueRangeChange: EventEmitter<Date[]> = new EventEmitter<Date[]>();
   animationState = 'void';
   override isRangePicker = false;
   _subs: Subscription[] = [];
@@ -73,6 +75,8 @@ export class BsDatepickerContainerComponent
   @HostBinding('attr.readonly') get isDatepickerReadonly() {
     return this.isDatePickerDisabled ? '' : null;
   }
+
+  private currentDate: Date | undefined;
 
   constructor(
     _renderer: Renderer2,
@@ -123,6 +127,16 @@ export class BsDatepickerContainerComponent
     this.showClearBtn = this._config.showClearButton;
     this.clearBtnLbl = this._config.clearButtonLabel;
     this.clearPos = this._config.clearPosition;
+    this.customButtons = [...(this._config.customButtons ?? [])];
+    const todayIdx = states.findIndex(state => state == this.todayPos);
+    const clearIdx = states.findIndex(state => state == this.clearPos);
+    if (todayIdx <= clearIdx) {
+      this.setupTodayButton();
+      this.setupClearButton();
+    } else {
+      this.setupClearButton();
+      this.setupTodayButton();
+    }
     this.customRangeBtnLbl = this._config.customRangeButtonLabel;
     this.withTimepicker = this._config.withTimepicker;
     this._effects
@@ -135,14 +149,13 @@ export class BsDatepickerContainerComponent
       .setEventHandlers(this)
       .registerDatepickerSideEffects();
 
-    let currentDate: Date | undefined;
     // todo: move it somewhere else
     // on selected date change
     this._subs.push(
       this._store
         .select((state) => state.selectedDate)
         .subscribe((date) => {
-          currentDate = date;
+          this.currentDate = date;
           this.valueChange.emit(date);
         })
     );
@@ -150,7 +163,7 @@ export class BsDatepickerContainerComponent
       this._store
         .select((state) => state.selectedTime)
         .subscribe((time) => {
-          if (!time || !time[0] || !(time[0] instanceof Date) || time[0] === currentDate) {
+          if (!time || !time[0] || !(time[0] instanceof Date) || time[0] === this.currentDate) {
             return;
           }
 
@@ -237,6 +250,10 @@ export class BsDatepickerContainerComponent
 
   override clearDate(): void {
     this._store.dispatch(this._actions.select(undefined));
+  }
+
+  override buttonClicked(action: DatePickerButtonAction | DateRangePickerButtonAction): void {
+    action((this.currentDate) as any);
   }
 
   ngOnDestroy(): void {

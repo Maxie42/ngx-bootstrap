@@ -258,7 +258,7 @@ export class BsDatepickerDirective implements OnInit, OnDestroy, OnChanges, Afte
         this._datepickerRef.instance.valueChange.subscribe((value: Date) => {
           this.initPreviousValue();
           this.bsValue = value;
-          if (this.keepDatepickerModalOpened()) {
+          if (this.keepDatepickerModalOpened() || !this._config.closeOnSelect) {
             return;
           }
 

@@ -53,6 +53,7 @@ import { DemoDatepickerPreventChangeToNextMonthComponent } from './demos/prevent
 import { DemoDatepickerWithTimepickerComponent } from './demos/with-timepicker/with-timepicker';
 import { DatepickerCloseBehaviorComponent } from './demos/closeBehaviour/datepicker-close-behavior';
 import { KeepDatesOutOfRulesComponent } from './demos/keep-dates-out-of-rules/keep-dates-out-of-rules.component';
+import { DemoDatepickerCustomButtonComponent } from './demos/custom-button/custom-button';
 
 export const demoComponentContent: ContentSection[] = [
   {
@@ -439,6 +440,14 @@ export const demoComponentContent: ContentSection[] = [
         outlet: DemoDatepickerClearButtonComponent
       },
       {
+        title: 'Show Custom Button',
+        anchor: 'datepicker-show-custom-button',
+        component: require('!!raw-loader!./demos/custom-button/custom-button.ts'),
+        html: require('!!raw-loader!./demos/custom-button/custom-button.html'),
+        description: `<p>Display optional extra buttons that will call the action specified on them.</p>`,
+        outlet: DemoDatepickerCustomButtonComponent
+      },
+      {
         title: 'Start view',
         anchor: 'start-view',
         component: require('!!raw-loader!./demos/start-view/start-view.ts'),
@@ -711,6 +720,11 @@ export const demoComponentContent: ContentSection[] = [
         title: 'Show Clear Button',
         anchor: 'datepicker-show-clear-button-ex',
         outlet: DemoDatepickerClearButtonComponent
+      },
+      {
+        title: 'Show Custom Buttons',
+        anchor: 'datepicker-show-custom-button-ex',
+        outlet: DemoDatepickerCustomButtonComponent
       },
       {
         title: 'Start view',

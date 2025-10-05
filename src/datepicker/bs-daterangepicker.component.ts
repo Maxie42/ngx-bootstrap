@@ -259,7 +259,7 @@ export class BsDaterangepickerDirective
           .subscribe((value: Date[]) => {
             this.initPreviousValue();
             this.bsValue = value;
-            if (this.keepDatepickerModalOpened()) {
+            if (this.keepDatepickerModalOpened() || !this._config.closeOnSelect) {
               return;
             }
 

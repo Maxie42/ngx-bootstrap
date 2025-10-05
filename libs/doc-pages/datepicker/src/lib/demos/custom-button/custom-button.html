@@ -1,0 +1,60 @@
+<div class="row">
+  <div class="col-xs-12 col-12 col-md-4 form-group mb-3">
+    <input type="text"
+           placeholder="Datepicker"
+            #dp="bsDatepicker"
+           class="form-control"
+           bsDatepicker
+           [ngClass]="hasDateChanged ? 'fst-italic' : ''"
+           [outsideClick]="false"
+           [(bsValue)]="bsValue"
+           [bsConfig]="config">
+  </div>
+  <div class="col-xs-12 col-12 col-sm-8 form-group mb-3">
+    <button class="btn btn-success"
+              (click)="withToday()"
+              type="button">
+        {{todayState}}
+    </button>
+    <button class="btn btn-success mx-2"
+              (click)="withClear()"
+              type="button">
+        {{clearState}}
+    </button>
+    <button class="btn btn-success mx-2"
+              (click)="withApplyAndCancel()"
+              type="button">
+        {{applyAndCancelState}}
+    </button>
+  </div>
+</div>
+<div class="row">
+  <div class="col-xs-12 col-12 col-md-4 form-group mb-3">
+    <input type="text"
+           placeholder="DateRangepicker"
+            #dpr="bsDaterangepicker"
+           class="form-control"
+           bsDaterangepicker
+           [ngClass]="hasDateRangeChanged ? 'fst-italic' : ''"
+           [outsideClick]="false"
+           [(ngModel)]="bsRangeValue"
+           [bsConfig]="rangeConfig">
+  </div>
+  <div class="col-xs-12 col-12 col-sm-8 form-group mb-3">
+    <button class="btn btn-success"
+              (click)="withToday('range')"
+              type="button">
+        {{todayStateRange}}
+    </button>
+    <button class="btn btn-success mx-2"
+              (click)="withClear('range')"
+              type="button">
+        {{clearStateRange}}
+    </button>
+    <button class="btn btn-success mx-2"
+              (click)="withApplyAndCancel('range')"
+              type="button">
+        {{applyAndCancelStateRange}}
+    </button>
+  </div>
+</div>

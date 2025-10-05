@@ -19,7 +19,7 @@ import { TimepickerComponent } from 'ngx-bootstrap/timepicker';
 
 import { BsDatepickerAbstractComponent } from '../../base/bs-datepicker-container';
 import { BsDatepickerConfig } from '../../bs-datepicker.config';
-import { CalendarCellViewModel, DayViewModel } from '../../models';
+import { CalendarCellViewModel, DatePickerButtonAction, DateRangePickerButtonAction, DayViewModel } from '../../models';
 import { BsDatepickerActions } from '../../reducer/bs-datepicker.actions';
 import { BsDatepickerEffects } from '../../reducer/bs-datepicker.effects';
 import { BsDatepickerStore } from '../../reducer/bs-datepicker.store';
@@ -32,6 +32,7 @@ import { TimepickerModule } from 'ngx-bootstrap/timepicker';
 import { BsDaysCalendarViewComponent } from './bs-days-calendar-view.component';
 import { NgIf, NgClass, NgSwitch, NgSwitchCase, NgFor, AsyncPipe } from '@angular/common';
 
+const states = ['left' , 'center' , 'right'];
 @Component({
     selector: 'bs-daterangepicker-container',
     providers: [BsDatepickerStore, BsDatepickerEffects, BsDatepickerActions],
@@ -88,7 +89,7 @@ export class BsDaterangepickerContainerComponent
   @HostBinding('attr.readonly') get isDatepickerReadonly() {
     return this.isDatePickerDisabled ? '' : null;
   }
-
+  private currentDate: Date[] | undefined;
   constructor(
     _renderer: Renderer2,
     private _config: BsDatepickerConfig,
@@ -135,6 +136,25 @@ export class BsDaterangepickerContainerComponent
     this.containerClass = this._config.containerClass;
     this.isOtherMonthsActive = this._config.selectFromOtherMonth;
     this.withTimepicker = this._config.withTimepicker;
+    // now we are allowing custom buttons for the range picker too
+    this.showTodayBtn = this._config.showTodayButton;
+    this.todayBtnLbl = this._config.todayButtonLabel;
+    this.todayPos = this._config.todayPosition;
+    this.showClearBtn = this._config.showClearButton;
+    this.clearBtnLbl = this._config.clearButtonLabel;
+    this.clearPos = this._config.clearPosition;
+    this.customButtons = [...this._config.customButtons];
+    const todayIdx = states.findIndex(state => state == this.todayPos);
+    const clearIdx = states.findIndex(state => state == this.clearPos);
+    if (todayIdx <= clearIdx) {
+      this.setupTodayButton();
+      this.setupClearButton();
+    } else {
+      this.setupClearButton();
+      this.setupTodayButton();
+    }
+
+
     this._effects
       ?.init(this._store)
       // intial state options
@@ -145,14 +165,14 @@ export class BsDaterangepickerContainerComponent
       // set event handlers
       .setEventHandlers(this)
       .registerDatepickerSideEffects();
-    let currentDate: Date[] | undefined;
+
     // todo: move it somewhere else
     // on selected date change
     this._subs.push(
       this._store
         .select((state) => state.selectedRange)
         .subscribe((dateRange) => {
-          currentDate = dateRange;
+          this.currentDate = dateRange;
           this.valueChange.emit(dateRange);
           this.chosenRange = dateRange || [];
         })
@@ -168,7 +188,7 @@ export class BsDaterangepickerContainerComponent
             !time[1] ||
             !(time[0] instanceof Date) ||
             !(time[1] instanceof Date) ||
-            (currentDate && time[0] === currentDate[0] && time[1] === currentDate[1])
+            (this.currentDate && time[0] === this.currentDate[0] && time[1] === this.currentDate[1])
           ) {
             return;
           }
@@ -307,6 +327,18 @@ export class BsDaterangepickerContainerComponent
     }
     this.selectedTimeSub.unsubscribe();
     this._effects?.destroy();
+  }
+  override setToday(): void {
+    const today = new Date();
+    this._store.dispatch(this._actions.selectRange([today, today]));
+  }
+
+  override clearDate(): void {
+    this._store.dispatch(this._actions.selectRange(undefined));
+  }
+
+  override buttonClicked(action: DatePickerButtonAction | DateRangePickerButtonAction): void {
+    action((this.currentDate) as any);
   }
 
   override setRangeOnCalendar(dates: BsCustomDates): void {
